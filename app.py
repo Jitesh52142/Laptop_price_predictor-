@@ -6,29 +6,21 @@ import numpy as np
 pipe = pickle.load(open('pipe.pkl', 'rb'))
 df = pickle.load(open('df.pkl', 'rb'))
 
-# 🌟 Add custom CSS styling for dark and light mode
+# 🌟 Add custom CSS styling
 st.markdown("""
     <style>
     /* 🌑 Dark Mode */
     .stApp {
-        background: linear-gradient(135deg, #1c1c1c, #2c2c2c);  /* Gradient background */
+        background: linear-gradient(135deg, #1c1c1c, #2c2c2c);
         color: #ffffff;
         font-family: 'Segoe UI', sans-serif;
-    }
-
-    /* 🌞 Light Mode */
-    @media (prefers-color-scheme: light) {
-        .stApp {
-            background: linear-gradient(135deg, #f0f2f6, #ffffff);
-            color: #333333;
-        }
     }
 
     /* ✅ Title Styling */
     .title {
         font-size: 56px;
         font-weight: bold;
-        color: #4CAF50; /* Green */
+        color: #4CAF50;
         text-align: center;
         margin-bottom: 40px;
         text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.5);
@@ -36,7 +28,7 @@ st.markdown("""
 
     /* ✅ Form Section Styling */
     .st-form {
-        background: rgba(255, 255, 255, 0.1);  /* Transparent card look */
+        background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         color: #ffffff;
         padding: 30px;
@@ -44,14 +36,6 @@ st.markdown("""
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
         margin-bottom: 40px;
         transition: all 0.3s ease;
-    }
-
-    @media (prefers-color-scheme: light) {
-        .st-form {
-            background: rgba(255, 255, 255, 0.9);
-            color: #333333;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
     }
 
     /* ✅ Button Styling */
@@ -72,9 +56,9 @@ st.markdown("""
         box-shadow: 0 10px 20px rgba(0, 255, 0, 0.6);
     }
 
-    /* ✅ Prediction Result Styling */
+    /* ✅ Result Box Styling */
     .result-box {
-        background: #2c2c2c;   /* Dark result box */
+        background: #2c2c2c;
         color: #4CAF50;
         padding: 20px;
         border-radius: 12px;
@@ -85,19 +69,16 @@ st.markdown("""
         transition: all 0.3s ease;
     }
 
-    @media (prefers-color-scheme: light) {
-        .result-box {
-            background: #ffffff;
-            color: #2c3e50;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
+    /* ✅ Alert Box Styling */
+    .alert-box {
+        background: #ff4d4d;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 20px;
     }
-
-    /* ✅ Smooth transitions for all sections */
-    .st-form, .result-box, .stButton>button {
-        transition: all 0.4s ease-in-out;
-    }
-
     </style>
 """, unsafe_allow_html=True)
 
@@ -110,49 +91,70 @@ with st.container():
 
     # Column 1: Laptop specs
     with col1:
-        company = st.selectbox('🔹 **Brand**', df['Company'].unique())
-        type = st.selectbox('🔹 **Type**', df['TypeName'].unique())
-        Ram = st.selectbox('🔹 **RAM (in GB)**', [2, 4, 6, 8, 12, 16, 24, 32, 64])
-        weight = st.number_input('🔹 **Weight (in kg)**', min_value=0.5, step=0.1)
+        company = st.selectbox('🔹 **Brand**', df['Company'].unique(), key='company')
+        type = st.selectbox('🔹 **Type**', df['TypeName'].unique(), key='type')
+        Ram = st.selectbox('🔹 **RAM (in GB)**', [2, 4, 6, 8, 12, 16, 24, 32, 64], key='ram')
+        weight = st.number_input('🔹 **Weight (in kg)**', min_value=0.5, step=0.1, key='weight')
 
-        touchscreen = st.radio('🔹 **Touchscreen**', ['Yes', 'No'])
-        ips = st.radio('🔹 **IPS Display**', ['Yes', 'No'])
+        touchscreen = st.radio('🔹 **Touchscreen**', ['Yes', 'No'], key='touchscreen')
+        ips = st.radio('🔹 **IPS Display**', ['Yes', 'No'], key='ips')
 
     # Column 2: Display and storage
     with col2:
-        Screen_size = st.number_input('📏 **Screen Size (in inches)**', min_value=10.0, step=0.1)
+        Screen_size = st.number_input('📏 **Screen Size (in inches)**', min_value=10.0, step=0.1, key='screen_size')
         resolution = st.selectbox('🖥️ **Screen Resolution**', 
                                   ['1920x1080', '1366x768', '1600x900', '3840x2160',
                                    '3200x1800', '2880x1800', '2560x1600', '2560x1440',
-                                   '2304x1440'])
+                                   '2304x1440'], key='resolution')
 
-        Cpu = st.selectbox('⚙️ **CPU**', df['CPU brand'].unique())
-        hdd = st.selectbox('💾 **HDD (in GB)**', [0, 128, 256, 512, 1024, 2048])
-        ssd = st.selectbox('🔋 **SSD (in GB)**', [0, 8, 128, 256, 512, 1024])
-        Gpu = st.selectbox('🎮 **GPU**', df['Gpu brand'].unique())
-        os = st.selectbox('🛠️ **Operating System**', df['os'].unique())
+        Cpu = st.selectbox('⚙️ **CPU**', df['CPU brand'].unique(), key='cpu')
+        Gpu = st.selectbox('🎮 **GPU**', df['Gpu brand'].unique(), key='gpu')
+        os = st.selectbox('🛠️ **Operating System**', df['os'].unique(), key='os')
+
+        # HDD/SSD with validation logic
+        hdd = st.selectbox('💾 **HDD (in GB)**', [0, 128, 256, 512, 1024, 2048], key='hdd')
+        ssd = st.selectbox('🔋 **SSD (in GB)**', [0, 8, 128, 256, 512, 1024], key='ssd')
+
+        # ✅ Auto-fill logic
+        if hdd > 0 and ssd == 0:
+            ssd = 0
+        elif ssd > 0 and hdd == 0:
+            hdd = 0
 
 # ✅ Prediction Button
 if st.button('🚀 **Predict Price**'):
-    # Converting categorical features
-    touchscreen = 1 if touchscreen == 'Yes' else 0
-    ips = 1 if ips == 'Yes' else 0
+    # 🔥 Validation: Check for missing fields
+    if (
+        not company or not type or not Ram or weight <= 0 or 
+        not touchscreen or not ips or Screen_size <= 0 or 
+        not resolution or not Cpu or not Gpu or not os
+    ):
+        st.markdown('<div class="alert-box">⚠️ Please fill all the fields before predicting!</div>', unsafe_allow_html=True)
 
-    # Screen resolution processing
-    x_res, y_res = map(int, resolution.split('x'))
-    ppi = ((x_res**2) + (y_res**2))**0.5 / Screen_size
+    # 🔥 Validate HDD/SSD logic: One must be filled
+    elif hdd == 0 and ssd == 0:
+        st.markdown('<div class="alert-box">⚠️ You must fill either HDD or SSD with a valid value!</div>', unsafe_allow_html=True)
+    
+    else:
+        # Converting categorical features
+        touchscreen = 1 if touchscreen == 'Yes' else 0
+        ips = 1 if ips == 'Yes' else 0
 
-    # Create query array
-    query = np.array([company, type, Ram, weight, touchscreen, ips, ppi, Cpu, hdd, ssd, Gpu, os])
-    query = query.reshape(1, 12)
+        # Screen resolution processing
+        x_res, y_res = map(int, resolution.split('x'))
+        ppi = ((x_res**2) + (y_res**2))**0.5 / Screen_size
 
-    # Prediction
-    predicted_price = int(np.exp(pipe.predict(query)))
+        # Create query array
+        query = np.array([company, type, Ram, weight, touchscreen, ips, ppi, Cpu, hdd, ssd, Gpu, os])
+        query = query.reshape(1, 12)
 
-    # 💡 Display result with custom styling
-    st.markdown(f"""
-        <div class="result-box">
-            💰 The predicted price of this configuration is:  
-            <strong>₹ {predicted_price}</strong>
-        </div>
-    """, unsafe_allow_html=True)
+        # ✅ Prediction
+        predicted_price = int(np.exp(pipe.predict(query)))
+
+        # 💡 Display result
+        st.markdown(f"""
+            <div class="result-box">
+                💰 The predicted price of this configuration is:  
+                <strong>₹ {predicted_price}</strong>
+            </div>
+        """, unsafe_allow_html=True)
