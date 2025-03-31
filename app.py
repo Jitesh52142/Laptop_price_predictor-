@@ -56,7 +56,7 @@ if st.button('Predict Price'):
     st.title("The predicted price of this Configuration is  :"+ str(int(np.exp(pipe.predict(query)))))
 
 
-=======
+
 import streamlit as st
 import pickle
 import numpy as np
@@ -115,4 +115,4 @@ if st.button('Predict Price'):
     st.title("The predicted price of this Configuration is  :"+ str(int(np.exp(pipe.predict(query)))))
 
 
->>>>>>> 650a217338d940b391a65e00a2b383cd8b74efaa
+
